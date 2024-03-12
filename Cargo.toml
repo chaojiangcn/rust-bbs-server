@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 ferris-says = "0.3.1"
-rocket = "0.5.0"
+rocket = { version = "0.5.0", features = ["json"] }
+chrono = "0.4.35"
