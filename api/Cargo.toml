@@ -1,0 +1,15 @@
+[package]
+name = "rust-bbs-api"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+entity = { path = "../entity" }
+service = { path = "../service" }
+rocket = { version = "0.5.0", features = ["json", "secrets"] }
+sea-orm-rocket = "0.5.4"
+async-trait = "0.1.77"
+sea-orm = { version = "0.12", features = ["sqlx-mysql", "runtime-tokio-native-tls", "macros"] }
+

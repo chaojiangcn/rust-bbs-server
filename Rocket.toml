@@ -1,2 +1,6 @@
 [default]
 port = 8000
+secret_key = "xjyaCrYj8KyMoiETCswKrJ1ZKFsEYCpXmQJmrj5bPa8="
+
+[default.databases.sea_orm]
+url = "mysql://root:adminRoot@127.0.0.1:3306/bbs"
