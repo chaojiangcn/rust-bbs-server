@@ -6,16 +6,18 @@ use rocket::serde::json::{json, Json, Value};
 use rocket::State;
 
 use sea_orm_rocket::Connection;
-use crate::pool::Db;
+use common::pool::Db;
+use common::response::{Response, success};
 
-use entity::post;
+use entity::post_temp;
+use entity::post_temp::Model;
 use service::{Mutation, Query};
 
 
 const DEFAULT_POSTS_PER_PAGE: u64 = 5;
 
 #[post("/", data = "<post_form>")]
-pub async fn create(conn: Connection<'_, Db>, post_form: Form<post::Model>) -> Flash<Redirect> {
+pub async fn create(conn: Connection<'_, Db>, post_form: Form<post_temp::Model>) -> Flash<Redirect> {
     let db = conn.into_inner();
 
     let form = post_form.into_inner();
@@ -31,7 +33,7 @@ pub async fn create(conn: Connection<'_, Db>, post_form: Form<post::Model>) -> F
 pub async fn update(
     conn: Connection<'_, Db>,
     id: i32,
-    post_form: Form<post::Model>,
+    post_form: Form<post_temp::Model>,
 ) -> Flash<Redirect> {
     let db = conn.into_inner();
 
@@ -56,7 +58,7 @@ pub async fn list(
     // Set page number and items per page
     let page = page.unwrap_or(1);
     if page == 0 {
-        return Err("Page number cannot be zero".to_string())
+        return Err("Page number cannot be zero".to_string());
     }
     let posts_per_page = posts_per_page.unwrap_or(DEFAULT_POSTS_PER_PAGE);
     if page == 0 {
@@ -77,26 +79,14 @@ pub async fn list(
     })))
 }
 
-// #[get("/<id>")]
-// pub async fn edit(conn: Connection<'_, Db>, id: i32) -> Json<Option<post::Model>> {
-//     let db = conn.into_inner();
-//
-//     let post: Option<post::Model> = Query::find_post_by_id(db, id)
-//         .await
-//         .expect("could not find post");
-//     Json(post)
-// }
-
 #[get("/<id>")]
-pub async fn edit(conn: Connection<'_, Db>, id: i32) -> Result<Json<Value>, String> {
+pub async fn edit(conn: Connection<'_, Db>, id: i32) -> Json<Response<Value>> {
     let db = conn.into_inner();
 
-    let post: Option<post::Model> = Query::find_post_by_id(db, id)
+    let post: Option<post_temp::Model> = Query::find_post_by_id(db, id)
         .await
         .expect("could not find post");
-    Ok(Json(json!({
-        "data": post
-    })))
+    Json(success(json!(post), "success"))
 }
 
 #[delete("/<id>")]

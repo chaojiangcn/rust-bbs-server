@@ -8,7 +8,6 @@
 
 ### 功能结构
 
-
 ## 项目部署
 
 ### 本地部署
@@ -18,7 +17,7 @@ DATABASE_URL="mysql://username:password@localhost/bbs"
 ```
 2、生成entity
 ```shell
-sea-orm-cli generate entity  -o entity/src
+sea-orm-cli generate entity  -o entity/src -l --with-serde both
 ```
 3、启动项目
 ```shell

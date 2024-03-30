@@ -1,10 +1,10 @@
-use ::entity::{post, post::Entity as Post};
+use ::entity::{post_temp, post_temp::Entity as Post};
 use sea_orm::*;
 
 pub struct Query;
 
 impl Query {
-    pub async fn find_post_by_id(db: &DbConn, id: i32) -> Result<Option<post::Model>, DbErr> {
+    pub async fn find_post_by_id(db: &DbConn, id: i32) -> Result<Option<post_temp::Model>, DbErr> {
         Post::find_by_id(id).one(db).await
     }
 
@@ -13,10 +13,10 @@ impl Query {
         db: &DbConn,
         page: u64,
         posts_per_page: u64,
-    ) -> Result<(Vec<post::Model>, u64), DbErr> {
+    ) -> Result<(Vec<post_temp::Model>, u64), DbErr> {
         // Setup paginator
         let paginator = Post::find()
-            .order_by_asc(post::Column::Id)
+            .order_by_asc(post_temp::Column::Id)
             .paginate(db, posts_per_page);
         let num_pages = paginator.num_pages().await?;
 
