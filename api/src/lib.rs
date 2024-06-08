@@ -1,15 +1,13 @@
 #[macro_use]
 extern crate rocket;
 
-mod temp;
 mod ums_user;
 mod post_api;
 
 use rocket::http::Method;
 use sea_orm_rocket::Database;
-use common::pool::Db;
-use crate::temp::{create, delete, destroy, edit, list, update};
-use crate::ums_user::read;
+use common::setup::set_up_db;
+use crate::ums_user::{read, register};
 use crate::post_api::post_list;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
@@ -40,15 +38,17 @@ async fn start() -> Result<(), rocket::Error> {
         }
     };
 
+    let db = match set_up_db().await {
+        Ok(db) => db,
+        Err(err) => panic!("DB connection is Error: {} , Please again", err),
+    };
+
     rocket::build()
         // 连接数据库
-        .attach(Db::init())
+        // .attach(Db::init())
+        .manage(db)
         .mount("/post", routes![post_list])
-        .mount(
-            "/post_temp",
-            routes![create, delete, destroy, list, edit, update],
-        )
-        .mount("/user", routes![read])
+        .mount("/user", routes![read, register])
         // .register("/", catchers![not_found])
         // .attach(Template::fairing())
         .attach(cors)

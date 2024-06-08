@@ -2,4 +2,4 @@
 
 pub use super::post::Entity as Post;
 pub use super::ums_member::Entity as UmsMember;
-pub use super::ums_user::Entity as UmsUser;
+pub use super::po::ums_user::Entity as UmsUser;

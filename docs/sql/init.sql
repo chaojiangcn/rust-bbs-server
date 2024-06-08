@@ -23,7 +23,6 @@ CREATE TABLE `ums_user`
     `follow_count`       int    NOT NULL,
     `fans_count`         int    NOT NULL,
     `roles`              text,
-    `forbidden_end_time` bigint NOT NULL DEFAULT '0',
     `create_time`        bigint          DEFAULT NULL,
     `update_time`        bigint          DEFAULT NULL,
     PRIMARY KEY (`id`),
@@ -31,7 +30,7 @@ CREATE TABLE `ums_user`
     UNIQUE KEY `email` (`email`),
     KEY                  `idx_user_score` (`score`),
     KEY                  `idx_user_status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- 初始化用户数据（用户名：admin、密码：123456）
 INSERT INTO ums_user (

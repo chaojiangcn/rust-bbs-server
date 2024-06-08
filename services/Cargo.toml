@@ -7,6 +7,9 @@ edition = "2021"
 [dependencies]
 entity = { path = "../entity" }
 common = { path = "../common"}
-validator = { version = "0.17.0", features = ["derive"] }
+validator = { version = "0.18.1", features = ["derive"] }
 sea-orm = { version = "0.12", features = ["sqlx-mysql", "runtime-tokio-native-tls", "macros"] }
 serde = { version = "1.0.196", features = ["derive"] }
+sea-orm-rocket = "0.5.4"
+chrono = "0.4.35"
+bcrypt = "0.15.1"
