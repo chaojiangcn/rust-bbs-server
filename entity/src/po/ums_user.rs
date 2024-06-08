@@ -32,9 +32,8 @@ pub struct Model {
     pub fans_count: i32,
     #[sea_orm(column_type = "Text", nullable)]
     pub roles: Option<String>,
-    pub forbidden_end_time: i64,
-    pub create_time: Option<i64>,
-    pub update_time: Option<i64>,
+    pub create_time: DateTime,
+    pub update_time: DateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
