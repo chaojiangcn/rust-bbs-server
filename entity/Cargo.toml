@@ -10,4 +10,5 @@ edition = "2021"
 rocket = { version = "0.5.0", features = ["json", "secrets"] }
 sea-orm = { version = "0.12", features = ["sqlx-mysql", "runtime-tokio-native-tls", "macros"] }
 serde = { version = "1.0.196", features = ["derive"] }
+validator = "0.18.1"
 
