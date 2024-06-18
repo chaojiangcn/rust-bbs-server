@@ -1,7 +1,9 @@
 // src/main.rs
 
+use jsonwebtoken::errors::Error;
 use rocket::Responder;
 use sea_orm::DbErr;
+use validator::ValidationErrors;
 
 #[derive(Responder)]
 #[response(status = 500, content_type = "json")]
@@ -27,6 +29,22 @@ impl From<String> for ErrorResponder {
 impl From<&str> for ErrorResponder {
     fn from(str: &str) -> ErrorResponder {
         str.to_owned().into()
+    }
+}
+
+impl From<ValidationErrors> for ErrorResponder {
+    fn from(value: ValidationErrors) -> Self {
+        ErrorResponder {
+            message: value.to_string(),
+        }
+    }
+}
+
+impl From<jsonwebtoken::errors::Error> for ErrorResponder {
+    fn from(value: Error) -> Self {
+        ErrorResponder {
+            message: value.to_string(),
+        }
     }
 }
 

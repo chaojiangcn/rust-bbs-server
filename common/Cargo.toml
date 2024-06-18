@@ -12,3 +12,5 @@ sea-orm-rocket = "0.5.4"
 sea-orm = { version = "0.12", features = ["sqlx-mysql", "runtime-tokio-native-tls", "macros"] }
 async-trait = "0.1.77"
 rand = "0.8.5"
+jsonwebtoken = "9.3.0"
+validator = { version = "0.18.1", features = ["derive"] }

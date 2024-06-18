@@ -4,12 +4,14 @@ extern crate rocket;
 mod ums_user;
 mod post_api;
 
+use rocket::fairing::Fairing;
 use rocket::http::Method;
 use sea_orm_rocket::Database;
 use common::setup::set_up_db;
-use crate::ums_user::{read, register};
+use crate::ums_user::{login, read, signup};
 use crate::post_api::post_list;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
+use common::auth::JwtFairing;
 
 
 #[rocket::main]
@@ -43,15 +45,18 @@ async fn start() -> Result<(), rocket::Error> {
         Err(err) => panic!("DB connection is Error: {} , Please again", err),
     };
 
+
+
     rocket::build()
         // 连接数据库
         // .attach(Db::init())
         .manage(db)
         .mount("/post", routes![post_list])
-        .mount("/user", routes![read, register])
+        .mount("/user", routes![read, signup, login])
         // .register("/", catchers![not_found])
         // .attach(Template::fairing())
         .attach(cors)
+        // .attach(JwtFairing)
         .launch()
         .await
         .map(|_| ())

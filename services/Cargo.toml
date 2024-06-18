@@ -13,3 +13,4 @@ serde = { version = "1.0.196", features = ["derive"] }
 sea-orm-rocket = "0.5.4"
 chrono = "0.4.35"
 bcrypt = "0.15.1"
+jsonwebtoken = "9.3.0"
