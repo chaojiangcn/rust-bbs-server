@@ -79,6 +79,9 @@ pub async fn login(db: &DbConn, login_req: LoginReq) -> Result<Json<Response<Val
 
     let res = LoginRes {
         token,
+        uid: user[0].id,
+        nickname: user[0].nickname.clone().unwrap_or("".to_string()),
+        avatar: user[0].avatar.clone().unwrap_or("".to_string()),
     };
     Ok(Json(success(json!((res)), "login success")))
 }

@@ -9,7 +9,7 @@ pub struct Response<T> {
 pub  fn success<T>(data: T, message: &str) -> Response<T> {
     Response {
         code: 200,
-        message: message.unwrap_or("success").to_string(),
+        message: message.to_string(),
         data,
     }
 }

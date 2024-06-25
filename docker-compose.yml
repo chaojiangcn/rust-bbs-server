@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  rust-bbs-server:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: mysql://root:rustRoot@db:3306/bbs
+    networks:
+      - rust_network
+
+  db:
+    image: mysql:8.0.30
+    environment:
+      MYSQL_ROOT_PASSWORD: rustRoot
+      MYSQL_DATABASE: bbs
+    ports:
+      - "3306:3306"
+    networks:
+      - rust_network
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docs/sql:/docker-entrypoint-initdb.d
+
+volumes:
+  db_data:
+networks:
+  rust_network:

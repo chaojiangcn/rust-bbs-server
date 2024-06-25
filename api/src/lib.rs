@@ -11,7 +11,6 @@ use common::setup::set_up_db;
 use crate::ums_user::{login, read, signup};
 use crate::post_api::post_list;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
-use common::auth::JwtFairing;
 
 
 #[rocket::main]
@@ -19,11 +18,13 @@ async fn start() -> Result<(), rocket::Error> {
 
     // let allowed_origins = AllowedOrigins::some_exact(&["https://www.acme.com"]);
     let allowed_origins = AllowedOrigins::all();
+    let allowed_headers = AllowedHeaders::some(&["Content-Type", "Authorization", "X-Custom-Header"]); // 允许特定的头字段
+
     // You can also deserialize this
     let cors = rocket_cors::CorsOptions {
         allowed_origins,
-        allowed_methods: vec![Method::Get].into_iter().map(From::from).collect(),
-        allowed_headers: AllowedHeaders::some(&["Authorization", "Accept"]),
+        allowed_methods: vec![Method::Get, Method::Post].into_iter().map(From::from).collect(),
+        allowed_headers,
         allow_credentials: true,
         ..Default::default()
     };
