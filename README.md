@@ -27,7 +27,7 @@
 ### 本地部署
 1、配置数据地址在`.env`文件中
 ```shell
-DATABASE_URL="mysql://username:password@localhost/bbs"
+DATABASE_URL="mysql://username:password@localhost"
 ```
 2、生成entity
 ```shell
@@ -35,5 +35,5 @@ sea-orm-cli generate entity  -o entity/src/po  --with-serde both
 ```
 3、启动项目
 ```shell
-cargo build
+DATABASE_URL = mysql://root:adminRoot@127.0.0.1:3306 cargo build
 ```

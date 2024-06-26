@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  rust-bbs-server:
+  api:
     build: .
     ports:
       - "8000:8000"
@@ -13,7 +11,8 @@ services:
       - rust_network
 
   db:
-    image: mysql:8.0.30
+#    image: mysql:8.0.30
+    image: registry.cn-heyuan.aliyuncs.com/cocaine_admin/bbs_mysql:8.0.30
     environment:
       MYSQL_ROOT_PASSWORD: rustRoot
       MYSQL_DATABASE: bbs
