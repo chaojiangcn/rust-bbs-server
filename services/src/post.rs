@@ -1,18 +1,85 @@
-use sea_orm::{DbConn, DbErr, EntityTrait, PaginatorTrait, QueryOrder};
+use sea_orm::{DbConn, EntityTrait, PaginatorTrait, QueryOrder};
+use sea_orm_rocket::rocket::serde::json::{Json, Value};
+use sea_orm_rocket::rocket::serde::json::serde_json::json;
+use validator::Validate;
+use common::custom_responder::ErrorResponder;
 use common::request::PageParams;
+use common::response::{error, Response, success};
 use entity::{post};
+use entity::po::ums_user;
+use entity::vo::posts::{AuthorInfo, PageRes, PostItemRes};
 
 pub struct PostService;
 
 
 impl PostService {
-    pub async fn get_list_in_page(db: &DbConn, req: PageParams) -> Result<(Vec<post::Model>, u64), DbErr> {
+    pub async fn get_post_detail(db: &DbConn, id: i32) -> Result<Json<Response<Value>>, ErrorResponder> {
+        let post = post::Entity::find_by_id(id)
+            .one(db)
+            .await?;
+        if post.is_none() {
+            return Ok(Json(error(json!(""), "post not found")));
+        }
+        let user = ums_user::Entity::find_by_id(id).one(db).await?;
+        let info = build_post_info(post.unwrap(), user);
+        Ok(Json(success(json!(info), "success")))
+    }
+    pub async fn get_list_in_page(db: &DbConn, req: PageParams) -> Result<Json<Response<Value>>, ErrorResponder> {
+        // 参数验证
+        if let Err(e) = req.validate() {
+            let err_str = e.to_string();
+            return Ok(Json(error(json!(""), &err_str)));
+        }
         let paginator = post::Entity::find()
             .order_by_asc(post::Column::Id)
             .paginate(db, req.size);
-
         let num_pages = paginator.num_pages().await?;
+        let res = paginator.fetch_page(req.page - 1).await;
+        let mut resp = PageRes {
+            list: vec![],
+            total: 0,
+        };
+        if let Ok((posts)) = res {
+            for post in posts.iter() {
+                let user = ums_user::Entity::find_by_id(post.author_id).one(db).await?;
 
-        paginator.fetch_page(req.page - 1).await.map(|p| (p, num_pages))
+                let info = build_post_info(post.clone(), user);
+                resp.list.push(info);
+            };
+            resp.total = num_pages;
+            return Ok(Json(success(json!(resp), "success")));
+        }
+
+        Ok(Json(success(json!(resp), "success")))
     }
+}
+
+fn build_post_info(post: post::Model, user: Option<ums_user::Model>) -> PostItemRes {
+    let user_info = match user {
+        None => AuthorInfo {
+            nickname: "momo".to_string(),
+            avatar: "url".to_string(),
+        },
+        Some(u) => AuthorInfo {
+            nickname: u.nickname.unwrap_or("momo".to_string()),
+            avatar: u.avatar.unwrap_or("url".to_string()),
+        },
+    };
+
+
+    let info = PostItemRes {
+        id: post.id.to_string(),
+        title: post.title.to_string(),
+        content: post.content.clone().unwrap_or("".to_string()),
+        images: vec![post.cover.clone().unwrap_or("".to_string())],
+        date: post.create_time,
+        author_info: AuthorInfo {
+            nickname: user_info.nickname,
+            avatar: user_info.avatar,
+        },
+        like_count: 0,
+        comment_count: 0,
+    };
+
+    info
 }

@@ -9,7 +9,7 @@ use rocket::http::Method;
 use sea_orm_rocket::Database;
 use common::setup::set_up_db;
 use crate::ums_user::{login, read, signup};
-use crate::post_api::post_list;
+use crate::post_api::{get_post_detail, post_list};
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 
@@ -52,7 +52,7 @@ async fn start() -> Result<(), rocket::Error> {
         // 连接数据库
         // .attach(Db::init())
         .manage(db)
-        .mount("/post", routes![post_list])
+        .mount("/post", routes![post_list,get_post_detail])
         .mount("/user", routes![read, signup, login])
         // .register("/", catchers![not_found])
         // .attach(Template::fairing())

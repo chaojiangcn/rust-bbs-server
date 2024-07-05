@@ -1,5 +1,5 @@
-#FROM rust:1.78.0 as builder
-FROM registry.cn-heyuan.aliyuncs.com/cocaine_admin/bbs_rust:1.78.0
+FROM rust:1.78.0 as builder
+#FROM registry.cn-heyuan.aliyuncs.com/cocaine_admin/bbs_rust:1.79.0
 WORKDIR /app
 
 COPY . .

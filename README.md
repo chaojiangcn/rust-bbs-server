@@ -35,5 +35,8 @@ sea-orm-cli generate entity  -o entity/src/po  --with-serde both
 ```
 3、启动项目
 ```shell
-DATABASE_URL = mysql://root:adminRoot@127.0.0.1:3306 cargo build
+# 配置终端配置环境变量（可选）
+export DATABASE_URL = mysql://root:adminRoot@127.0.0.1:3306 
+
+cargo build
 ```

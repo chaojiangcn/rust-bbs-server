@@ -2413,6 +2413,7 @@ dependencies = [
  "common",
  "entity",
  "jsonwebtoken",
+ "log",
  "sea-orm",
  "sea-orm-rocket",
  "serde",

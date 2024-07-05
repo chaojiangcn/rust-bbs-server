@@ -86,21 +86,21 @@ pub async fn login(db: &DbConn, login_req: LoginReq) -> Result<Json<Response<Val
     Ok(Json(success(json!((res)), "login success")))
 }
 
-pub async fn register(db: &DbConn, rep: AddUserReq) -> Result<Json<Response<Value>>, ErrorResponder> {
+pub async fn register(db: &DbConn, req: AddUserReq) -> Result<Json<Response<Value>>, ErrorResponder> {
     // 参数验证
-    if let Err(e) = rep.validate() {
+    if let Err(e) = req.validate() {
         let err_str = e.to_string();
         return Ok(Json(error(json!(""), &err_str)));
     }
 
-    let psd = hash(rep.password.clone(), bcrypt::DEFAULT_COST).unwrap();
+    let psd = hash(req.password.clone(), bcrypt::DEFAULT_COST).unwrap();
     let name = generate_random_ascii_string(2);
     // 生成随机昵称(rustXXX)
     let nickname = format!("rust{}", name);
 
     let model = ums_user::ActiveModel {
         id: NotSet,
-        email: Set(Option::from(rep.email)),
+        email: Set(Option::from(req.email)),
         password: Set(Option::from(psd)),
         nickname: Set(Option::from(nickname)),
         create_time: Set(Local::now().naive_local()),

@@ -1,5 +1,3 @@
-// src/main.rs
-
 use jsonwebtoken::errors::Error;
 use rocket::Responder;
 use sea_orm::DbErr;
