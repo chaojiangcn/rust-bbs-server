@@ -103,7 +103,7 @@ pub async fn register(db: &DbConn, req: AddUserReq) -> Result<Json<Response<Valu
         email: Set(Option::from(req.email)),
         password: Set(Option::from(psd)),
         nickname: Set(Option::from(nickname)),
-        create_time: Set(Local::now().naive_local()),
+        create_time: Set(Local::now().naive_local().into()),
         ..Default::default()
     };
 

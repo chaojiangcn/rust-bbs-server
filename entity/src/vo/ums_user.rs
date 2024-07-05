@@ -17,7 +17,7 @@ pub struct LoginReq {
 #[derive(Deserialize, Serialize)]
 pub struct LoginRes {
     pub token: String,
-    pub uid: i64,
+    pub uid: i32,
     pub nickname: String,
     pub avatar: String,
 }

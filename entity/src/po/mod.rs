@@ -3,6 +3,9 @@
 pub mod prelude;
 
 pub mod cms_nav;
+pub mod comment;
+pub mod favorite;
+pub mod like;
 pub mod post;
 pub mod ums_member;
 pub mod ums_user;

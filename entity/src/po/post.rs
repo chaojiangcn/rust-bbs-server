@@ -22,9 +22,35 @@ pub struct Model {
     pub read_num: Option<i32>,
     pub collection_num: Option<i32>,
     pub cover: Option<String>,
+    pub is_deleted: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(has_many = "super::comment::Entity")]
+    Comment,
+    #[sea_orm(has_many = "super::favorite::Entity")]
+    Favorite,
+    #[sea_orm(has_many = "super::like::Entity")]
+    Like,
+}
+
+impl Related<super::comment::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Comment.def()
+    }
+}
+
+impl Related<super::favorite::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Favorite.def()
+    }
+}
+
+impl Related<super::like::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Like.def()
+    }
+}
 
 impl ActiveModelBehavior for ActiveModel {}
