@@ -1,7 +1,7 @@
 pub mod query;
 pub mod ums_user;
-mod auth;
 pub mod post;
+pub mod like;
 
 pub use query::*;
 

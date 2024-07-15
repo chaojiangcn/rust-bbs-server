@@ -2,7 +2,15 @@
 
 pub mod prelude;
 
+pub mod actions;
 pub mod cms_nav;
+pub mod comment;
+pub mod favorite;
+pub mod follow;
+pub mod like;
 pub mod post;
+pub mod post_tag;
+pub mod tag;
 pub mod ums_member;
 pub mod ums_user;
+pub mod user_actions;

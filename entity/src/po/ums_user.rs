@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 #[sea_orm(table_name = "ums_user")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i64,
+    pub id: i32,
     #[sea_orm(unique)]
     pub username: Option<String>,
     #[sea_orm(unique)]
@@ -32,11 +32,44 @@ pub struct Model {
     pub fans_count: i32,
     #[sea_orm(column_type = "Text", nullable)]
     pub roles: Option<String>,
-    pub create_time: DateTime,
+    pub create_time: Option<DateTime>,
     pub update_time: DateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(has_many = "super::comment::Entity")]
+    Comment,
+    #[sea_orm(has_many = "super::favorite::Entity")]
+    Favorite,
+    #[sea_orm(has_many = "super::like::Entity")]
+    Like,
+    #[sea_orm(has_many = "super::user_actions::Entity")]
+    UserActions,
+}
+
+impl Related<super::comment::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Comment.def()
+    }
+}
+
+impl Related<super::favorite::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Favorite.def()
+    }
+}
+
+impl Related<super::like::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Like.def()
+    }
+}
+
+impl Related<super::user_actions::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::UserActions.def()
+    }
+}
 
 impl ActiveModelBehavior for ActiveModel {}

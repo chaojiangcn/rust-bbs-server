@@ -14,9 +14,9 @@ pub  fn success<T>(data: T, message: &str) -> Response<T> {
     }
 }
 
-pub fn  error<T>(code: i32, message: &str, data: T) -> Response<T> {
+pub fn  error<T>(data: T,message: &str) -> Response<T> {
     Response {
-        code,
+        code: 500,
         message: message.to_string(),
         data,
     }
