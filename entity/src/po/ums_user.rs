@@ -44,6 +44,8 @@ pub enum Relation {
     Favorite,
     #[sea_orm(has_many = "super::like::Entity")]
     Like,
+    #[sea_orm(has_many = "super::user_actions::Entity")]
+    UserActions,
 }
 
 impl Related<super::comment::Entity> for Entity {
@@ -61,6 +63,12 @@ impl Related<super::favorite::Entity> for Entity {
 impl Related<super::like::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Like.def()
+    }
+}
+
+impl Related<super::user_actions::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::UserActions.def()
     }
 }
 

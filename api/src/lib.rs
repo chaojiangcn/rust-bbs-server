@@ -3,6 +3,7 @@ extern crate rocket;
 
 mod ums_user;
 mod post_api;
+mod like_api;
 
 use rocket::fairing::Fairing;
 use rocket::http::Method;

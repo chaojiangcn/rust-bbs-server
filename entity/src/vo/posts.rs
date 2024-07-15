@@ -1,5 +1,6 @@
 use rocket::serde::{Deserialize, Serialize};
 use sea_orm::prelude::DateTime;
+use validator::Validate;
 
 #[derive(Deserialize, Serialize)]
 pub struct AuthorInfo {
@@ -18,8 +19,12 @@ pub struct PostItemRes {
     pub comment_count: i64,
 }
 
-#[derive(Deserialize, Serialize)]
-pub struct PageRes{
-    pub list: Vec<PostItemRes>,
-    pub total: u64,
+#[derive(Validate, Deserialize, Serialize)]
+pub struct AddPostReq {
+    #[validate(length(min = 1))]
+    pub title: String,
+    pub author_id: i32,
+    pub content: String,
+    pub tag_id: Option<i32>,
+    pub cover: String,
 }

@@ -1,4 +1,6 @@
-use sea_orm::{DbConn, EntityTrait, PaginatorTrait, QueryOrder};
+use chrono::Local;
+use log::trace;
+use sea_orm::{DbConn, EntityTrait, NotSet, PaginatorTrait, QueryOrder, Set};
 use sea_orm_rocket::rocket::serde::json::{Json, Value};
 use sea_orm_rocket::rocket::serde::json::serde_json::json;
 use validator::Validate;
@@ -7,12 +9,35 @@ use common::request::PageParams;
 use common::response::{error, Response, success};
 use entity::{post};
 use entity::po::ums_user;
-use entity::vo::posts::{AuthorInfo, PageRes, PostItemRes};
+use entity::vo::common::PageRes;
+use entity::vo::posts::{AddPostReq, AuthorInfo, PostItemRes};
 
 pub struct PostService;
 
 
 impl PostService {
+    pub async fn add_post(db: &DbConn, add_post_req: Json<AddPostReq>) -> Result<Json<Response<Value>>, ErrorResponder> {
+        if let Err(e) = add_post_req.validate() {
+            let err_str = e.to_string();
+            return Ok(Json(error(json!(""), &err_str)));
+        }
+
+        let model = post::ActiveModel {
+            id: NotSet,
+            title: Set(add_post_req.title.clone()),
+            content: Set(Option::from(add_post_req.content.clone())),
+            cover: Set(Option::from(add_post_req.cover.clone())),
+            author_id: Set(add_post_req.author_id.clone()),
+            create_time: Set(Local::now().naive_local().into()),
+            ..Default::default()
+        };
+
+        if let Err(err) = post::Entity::insert(model).exec(db).await {
+            trace!("Error inserting post: {}", err);
+            return Err(ErrorResponder::from(err));
+        };
+        Ok(Json(success(json!(()), "add success")))
+    }
     pub async fn get_post_detail(db: &DbConn, id: i32) -> Result<Json<Response<Value>>, ErrorResponder> {
         let post = post::Entity::find_by_id(id)
             .one(db)

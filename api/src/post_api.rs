@@ -8,6 +8,7 @@ use sea_orm_rocket::Connection;
 use common::custom_responder::ErrorResponder;
 use common::request::PageParams;
 use common::response::{Response, success};
+use entity::vo::posts::AddPostReq;
 
 use service::post::PostService;
 
@@ -23,4 +24,9 @@ pub async fn post_list(
 #[get("/detail/<id>")]
 pub async fn get_post_detail(db: &State<DatabaseConnection>, id: i32) -> Result<Json<Response<Value>>, ErrorResponder> {
     PostService::get_post_detail(db, id).await
+}
+
+#[post("/add", data = "<add_post_req>")]
+pub async fn add_post(db: &State<DatabaseConnection>, add_post_req: Json<AddPostReq>) -> Result<Json<Response<Value>>, ErrorResponder> {
+    PostService::add_post(db, add_post_req).await
 }
