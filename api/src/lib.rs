@@ -5,19 +5,17 @@ mod ums_user;
 mod post_api;
 mod like_api;
 
-use rocket::fairing::Fairing;
 use rocket::http::Method;
-use sea_orm_rocket::Database;
 use common::setup::set_up_db;
 use crate::ums_user::{login, read, signup};
-use crate::post_api::{get_post_detail, post_list};
+use crate::post_api::{add_post, get_post_detail, post_list};
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
+use crate::like_api::{get_list_in_page, like, unlike};
 
 
 #[rocket::main]
 async fn start() -> Result<(), rocket::Error> {
 
-    // let allowed_origins = AllowedOrigins::some_exact(&["https://www.acme.com"]);
     let allowed_origins = AllowedOrigins::all();
     let allowed_headers = AllowedHeaders::some(&["Content-Type", "Authorization", "X-Custom-Header"]); // 允许特定的头字段
 
@@ -47,18 +45,12 @@ async fn start() -> Result<(), rocket::Error> {
         Err(err) => panic!("DB connection is Error: {} , Please again", err),
     };
 
-
-
     rocket::build()
-        // 连接数据库
-        // .attach(Db::init())
         .manage(db)
-        .mount("/post", routes![post_list,get_post_detail])
+        .mount("/post", routes![post_list, get_post_detail, add_post])
         .mount("/user", routes![read, signup, login])
-        // .register("/", catchers![not_found])
-        // .attach(Template::fairing())
+        .mount("/like", routes![like, unlike, get_list_in_page])
         .attach(cors)
-        // .attach(JwtFairing)
         .launch()
         .await
         .map(|_| ())

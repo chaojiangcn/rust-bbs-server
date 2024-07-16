@@ -64,7 +64,7 @@ impl PostService {
             list: vec![],
             total: 0,
         };
-        if let Ok((posts)) = res {
+        if let Ok(posts) = res {
             for post in posts.iter() {
                 let user = ums_user::Entity::find_by_id(post.author_id).one(db).await?;
 
