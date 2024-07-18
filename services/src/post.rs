@@ -7,10 +7,12 @@ use validator::Validate;
 use common::custom_responder::ErrorResponder;
 use common::request::PageParams;
 use common::response::{error, Response, success};
-use entity::{post};
-use entity::po::ums_user;
+use entity::post;
+use entity::po::{favorite, ums_user};
 use entity::vo::common::PageRes;
 use entity::vo::posts::{AddPostReq, AuthorInfo, PostItemRes};
+use super::like::LikeService;
+use super::favorite::FavoriteService;
 
 pub struct PostService;
 
@@ -38,6 +40,8 @@ impl PostService {
         };
         Ok(Json(success(json!(()), "add success")))
     }
+
+    /// 获取帖子详情
     pub async fn get_post_detail(db: &DbConn, id: i32) -> Result<Json<Response<Value>>, ErrorResponder> {
         let post = post::Entity::find_by_id(id)
             .one(db)
@@ -46,9 +50,12 @@ impl PostService {
             return Ok(Json(error(json!(""), "post not found")));
         }
         let user = ums_user::Entity::find_by_id(id).one(db).await?;
-        let info = build_post_info(post.unwrap(), user);
+        let like_count = LikeService::get_count(db, id).await;
+        let favorite_count = FavoriteService::get_count(db, id).await;
+        let info = build_post_info(post.unwrap(), user, like_count);
         Ok(Json(success(json!(info), "success")))
     }
+
     pub async fn get_list_in_page(db: &DbConn, req: PageParams) -> Result<Json<Response<Value>>, ErrorResponder> {
         // 参数验证
         if let Err(e) = req.validate() {

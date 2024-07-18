@@ -3,7 +3,7 @@ use rocket::State;
 use sea_orm::DatabaseConnection;
 use common::custom_responder::ErrorResponder;
 use common::request::PageParams;
-use common::response::{Response};
+use common::response::Response;
 use entity::vo::posts::AddPostReq;
 
 use service::post::PostService;
