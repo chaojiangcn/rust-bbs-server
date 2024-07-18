@@ -4,12 +4,14 @@ extern crate rocket;
 mod ums_user;
 mod post_api;
 mod like_api;
+mod favorite_api;
 
 use rocket::http::Method;
 use common::setup::set_up_db;
 use crate::ums_user::{login, read, signup};
 use crate::post_api::{add_post, get_post_detail, post_list};
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
+use crate::favorite_api::{favorite, un_favorite};
 use crate::like_api::{get_list_in_page, like, unlike};
 
 
@@ -50,6 +52,7 @@ async fn start() -> Result<(), rocket::Error> {
         .mount("/post", routes![post_list, get_post_detail, add_post])
         .mount("/user", routes![read, signup, login])
         .mount("/like", routes![like, unlike, get_list_in_page])
+        .mount("/favorite", routes![favorite, un_favorite])
         .attach(cors)
         .launch()
         .await

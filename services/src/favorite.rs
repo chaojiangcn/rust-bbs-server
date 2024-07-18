@@ -1,34 +1,25 @@
+use async_trait::async_trait;
 use common::{custom_responder::ErrorResponder, response::Response};
-use entity::po::favorite;
-use sea_orm::{ColumnTrait, DbConn, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder, Value};
-use sea_orm_rocket::rocket::serde::json::Json;
+use sea_orm::DbConn;
+use sea_orm_rocket::rocket::serde::json::{Json, Value};
 
-pub struct FavoriteService;
+#[async_trait]
+pub trait FavoriteService: Send + Sync {
+    // async fn get_count(&self, db: &DbConn, post_id: i32) -> u64;
 
-impl FavoriteService {
-    pub async fn get_count(db: &DbConn, post_id: i32) -> u64 {
-        let res = favorite::Entity::find()
-            .filter(favorite::Column::PostId.eq(post_id))
-            .count(db)
-            .await;
-        return if res.is_err() { 0 } else { res.unwrap() };
-    }
-
-    pub async fn favorite_handle(
+    async fn favorite_handle(
+        &self,
         db: &DbConn,
         post_id: i32,
         user_id: i32,
-    ) -> Result<Json<Response<Value>>, ErrorResponder> {
-        let res = favorite::Entity::insert(favorite::ActiveModel {
-            post_id: sea_orm::Set(post_id),
-            user_id: sea_orm::Set(user_id),
-            ..Default::default()
-        });
+    ) -> Result<Json<Response<Value>>, ErrorResponder>;
 
-        if let Err(err) = res.exec(db).await {
-          return Err(ErrorResponder::from(err));
-      }
-
-      Ok(Json(success(json!({}), "success")))
-    }
+    async fn un_favorite_handle(
+        &self,
+        db: &DbConn,
+        post_id: i32,
+        user_id: i32,
+    ) -> Result<Json<Response<Value>>, ErrorResponder>;
 }
+
+

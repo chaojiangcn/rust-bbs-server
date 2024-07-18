@@ -11,8 +11,8 @@ use entity::post;
 use entity::po::{favorite, ums_user};
 use entity::vo::common::PageRes;
 use entity::vo::posts::{AddPostReq, AuthorInfo, PostItemRes};
+use crate::favorite::FavoriteService;
 use super::like::LikeService;
-use super::favorite::FavoriteService;
 
 pub struct PostService;
 
@@ -51,8 +51,8 @@ impl PostService {
         }
         let user = ums_user::Entity::find_by_id(id).one(db).await?;
         let like_count = LikeService::get_count(db, id).await;
-        let favorite_count = FavoriteService::get_count(db, id).await;
-        let info = build_post_info(post.unwrap(), user, like_count);
+        let favorite_count = FavoriteService::get_count(&(), db, id).await;
+        let info = build_post_info(post.unwrap(), user, like_count as i64,  favorite_count as i64, 0);
         Ok(Json(success(json!(info), "success")))
     }
 
@@ -74,8 +74,9 @@ impl PostService {
         if let Ok(posts) = res {
             for post in posts.iter() {
                 let user = ums_user::Entity::find_by_id(post.author_id).one(db).await?;
+                let like_count = LikeService::get_count(db, post.id).await;
 
-                let info = build_post_info(post.clone(), user);
+                let info = build_post_info(post.clone(), user, 0, 0, 0);
                 resp.list.push(info);
             };
             resp.total = num_pages;
@@ -86,7 +87,7 @@ impl PostService {
     }
 }
 
-fn build_post_info(post: post::Model, user: Option<ums_user::Model>) -> PostItemRes {
+fn build_post_info(post: post::Model, user: Option<ums_user::Model>, like_count: i64, favorite_count: i64, comment_count: i64) -> PostItemRes {
     let user_info = match user {
         None => AuthorInfo {
             nickname: "momo".to_string(),
@@ -109,8 +110,9 @@ fn build_post_info(post: post::Model, user: Option<ums_user::Model>) -> PostItem
             nickname: user_info.nickname,
             avatar: user_info.avatar,
         },
-        like_count: 0,
-        comment_count: 0,
+        like_count,
+        favorite_count,
+        comment_count,
     };
 
     info

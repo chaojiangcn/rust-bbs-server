@@ -1,0 +1,1 @@
+pub mod favorite_impl;

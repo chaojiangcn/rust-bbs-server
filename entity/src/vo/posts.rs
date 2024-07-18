@@ -17,6 +17,7 @@ pub struct PostItemRes {
     pub author_info: AuthorInfo,
     pub like_count: i64,
     pub comment_count: i64,
+    pub favorite_count: i64,
 }
 
 #[derive(Validate, Deserialize, Serialize)]
