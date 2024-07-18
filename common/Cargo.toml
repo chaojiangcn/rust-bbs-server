@@ -9,7 +9,7 @@ edition = "2021"
 serde = { version = "1.0.197", features = ["derive"] }
 rocket = { version = "0.5.0", features = ["json", "secrets"] }
 sea-orm-rocket = "0.5.4"
-sea-orm = { version = "0.12", features = ["sqlx-mysql", "runtime-tokio-native-tls", "macros"] }
+sea-orm = { version = "0.12.15", features = ["sqlx-mysql", "runtime-tokio-native-tls", "macros"] }
 async-trait = "0.1.77"
 rand = "0.8.5"
 jsonwebtoken = "9.3.0"

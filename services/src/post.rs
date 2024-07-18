@@ -1,22 +1,26 @@
+use super::like::LikeService;
+use crate::favorite::FavoriteService;
 use chrono::Local;
-use log::trace;
-use sea_orm::{DbConn, EntityTrait, NotSet, PaginatorTrait, QueryOrder, Set};
-use sea_orm_rocket::rocket::serde::json::{Json, Value};
-use sea_orm_rocket::rocket::serde::json::serde_json::json;
-use validator::Validate;
 use common::custom_responder::ErrorResponder;
 use common::request::PageParams;
-use common::response::{error, Response, success};
-use entity::{post};
+use common::response::{error, success, Response};
 use entity::po::ums_user;
+use entity::post;
 use entity::vo::common::PageRes;
 use entity::vo::posts::{AddPostReq, AuthorInfo, PostItemRes};
+use log::trace;
+use sea_orm::{DbConn, EntityTrait, NotSet, PaginatorTrait, QueryOrder, Set};
+use sea_orm_rocket::rocket::serde::json::serde_json::json;
+use sea_orm_rocket::rocket::serde::json::{Json, Value};
+use validator::Validate;
 
 pub struct PostService;
 
-
 impl PostService {
-    pub async fn add_post(db: &DbConn, add_post_req: Json<AddPostReq>) -> Result<Json<Response<Value>>, ErrorResponder> {
+    pub async fn add_post(
+        db: &DbConn,
+        add_post_req: Json<AddPostReq>,
+    ) -> Result<Json<Response<Value>>, ErrorResponder> {
         if let Err(e) = add_post_req.validate() {
             let err_str = e.to_string();
             return Ok(Json(error(json!(""), &err_str)));
@@ -38,18 +42,33 @@ impl PostService {
         };
         Ok(Json(success(json!(()), "add success")))
     }
-    pub async fn get_post_detail(db: &DbConn, id: i32) -> Result<Json<Response<Value>>, ErrorResponder> {
-        let post = post::Entity::find_by_id(id)
-            .one(db)
-            .await?;
+
+    /// 获取帖子详情
+    pub async fn get_post_detail(
+        db: &DbConn,
+        id: i32,
+    ) -> Result<Json<Response<Value>>, ErrorResponder> {
+        let post = post::Entity::find_by_id(id).one(db).await?;
         if post.is_none() {
             return Ok(Json(error(json!(""), "post not found")));
         }
         let user = ums_user::Entity::find_by_id(id).one(db).await?;
-        let info = build_post_info(post.unwrap(), user);
+        let like_count = LikeService::get_count(db, id).await;
+        let favorite_count = FavoriteService::get_count(db, id).await;
+        let info = build_post_info(
+            post.unwrap(),
+            user,
+            like_count as i64,
+            favorite_count as i64,
+            0,
+        );
         Ok(Json(success(json!(info), "success")))
     }
-    pub async fn get_list_in_page(db: &DbConn, req: PageParams) -> Result<Json<Response<Value>>, ErrorResponder> {
+
+    pub async fn get_list_in_page(
+        db: &DbConn,
+        req: PageParams,
+    ) -> Result<Json<Response<Value>>, ErrorResponder> {
         // 参数验证
         if let Err(e) = req.validate() {
             let err_str = e.to_string();
@@ -64,13 +83,14 @@ impl PostService {
             list: vec![],
             total: 0,
         };
-        if let Ok((posts)) = res {
+        if let Ok(posts) = res {
             for post in posts.iter() {
                 let user = ums_user::Entity::find_by_id(post.author_id).one(db).await?;
+                let like_count = LikeService::get_count(db, post.id).await;
 
-                let info = build_post_info(post.clone(), user);
+                let info = build_post_info(post.clone(), user, like_count as i64, 0, 0);
                 resp.list.push(info);
-            };
+            }
             resp.total = num_pages;
             return Ok(Json(success(json!(resp), "success")));
         }
@@ -79,7 +99,13 @@ impl PostService {
     }
 }
 
-fn build_post_info(post: post::Model, user: Option<ums_user::Model>) -> PostItemRes {
+fn build_post_info(
+    post: post::Model,
+    user: Option<ums_user::Model>,
+    like_count: i64,
+    favorite_count: i64,
+    comment_count: i64,
+) -> PostItemRes {
     let user_info = match user {
         None => AuthorInfo {
             nickname: "momo".to_string(),
@@ -91,7 +117,6 @@ fn build_post_info(post: post::Model, user: Option<ums_user::Model>) -> PostItem
         },
     };
 
-
     let info = PostItemRes {
         id: post.id.to_string(),
         title: post.title.to_string(),
@@ -102,8 +127,9 @@ fn build_post_info(post: post::Model, user: Option<ums_user::Model>) -> PostItem
             nickname: user_info.nickname,
             avatar: user_info.avatar,
         },
-        like_count: 0,
-        comment_count: 0,
+        like_count,
+        favorite_count,
+        comment_count,
     };
 
     info
