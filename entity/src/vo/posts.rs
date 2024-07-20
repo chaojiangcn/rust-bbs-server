@@ -6,6 +6,7 @@ use validator::Validate;
 pub struct AuthorInfo {
     pub nickname: String,
     pub avatar: String,
+    pub user_id: i32,
 }
 #[derive(Deserialize, Serialize)]
 pub struct PostItemRes {

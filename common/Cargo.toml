@@ -6,12 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = { version = "1.0.197", features = ["derive"] }
-rocket = { version = "0.5.0", features = ["json", "secrets"] }
-sea-orm-rocket = "0.5.4"
-sea-orm = { version = "0.12.15", features = ["sqlx-mysql", "runtime-tokio-native-tls", "macros"] }
-async-trait = "0.1.77"
-rand = "0.8.5"
-jsonwebtoken = "9.3.0"
-validator = { version = "0.18.1", features = ["derive"] }
-dotenv = "0.15.0"
+serde = { workspace = true }
+rocket = { workspace = true }
+sea-orm-rocket = { workspace = true }
+sea-orm = { workspace = true }
+jsonwebtoken = { workspace = true }
+validator = { workspace = true }
+dotenv = { workspace = true }
+rand = { workspace = true }
+async-trait = { workspace = true}

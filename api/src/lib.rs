@@ -5,19 +5,21 @@ mod ums_user;
 mod post_api;
 mod like_api;
 mod favorite_api;
+mod follow_api;
+mod comment_api;
 
 use rocket::http::Method;
 use common::setup::set_up_db;
 use crate::ums_user::{login, read, signup};
 use crate::post_api::{add_post, get_post_detail, post_list};
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
+use crate::comment_api::{add_comment, delete_comment, get_list_with_page};
 use crate::favorite_api::{favorite, un_favorite};
 use crate::like_api::{get_list_in_page, like, unlike};
 
 
 #[rocket::main]
 async fn start() -> Result<(), rocket::Error> {
-
     let allowed_origins = AllowedOrigins::all();
     let allowed_headers = AllowedHeaders::some(&["Content-Type", "Authorization", "X-Custom-Header"]); // 允许特定的头字段
 
@@ -53,6 +55,8 @@ async fn start() -> Result<(), rocket::Error> {
         .mount("/user", routes![read, signup, login])
         .mount("/like", routes![like, unlike, get_list_in_page])
         .mount("/favorite", routes![favorite, un_favorite])
+        .mount("/follow", routes![follow_api::follow, follow_api::un_follow])
+        .mount("/comment", routes![get_list_with_page, add_comment, delete_comment])
         .attach(cors)
         .launch()
         .await

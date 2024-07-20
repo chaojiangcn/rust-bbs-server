@@ -52,11 +52,12 @@ impl PostService {
         if post.is_none() {
             return Ok(Json(error(json!(""), "post not found")));
         }
-        let user = ums_user::Entity::find_by_id(id).one(db).await?;
+        let post = post.unwrap();
+        let user = ums_user::Entity::find_by_id(post.author_id).one(db).await?;
         let like_count = LikeService::get_count(db, id).await;
         let favorite_count = FavoriteService::get_count(db, id).await;
         let info = build_post_info(
-            post.unwrap(),
+            post,
             user,
             like_count as i64,
             favorite_count as i64,
@@ -110,10 +111,12 @@ fn build_post_info(
         None => AuthorInfo {
             nickname: "momo".to_string(),
             avatar: "url".to_string(),
+            user_id: 0,
         },
         Some(u) => AuthorInfo {
-            nickname: u.nickname.unwrap_or("momo".to_string()),
-            avatar: u.avatar.unwrap_or("url".to_string()),
+            nickname: u.nickname.unwrap(),
+            avatar: u.avatar.unwrap(),
+            user_id: u.id,
         },
     };
 
@@ -126,6 +129,7 @@ fn build_post_info(
         author_info: AuthorInfo {
             nickname: user_info.nickname,
             avatar: user_info.avatar,
+            user_id: user_info.user_id,
         },
         like_count,
         favorite_count,

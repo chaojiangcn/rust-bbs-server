@@ -6,20 +6,28 @@ edition = "2021"
 [workspace]
 members = ["api", "common", "config", "entity", "services"]
 
+[workspace.dependencies]
+rocket = { version = "0.5.0", features = ["json", "secrets"] }
+sea-orm-migration = "0.12.15"
+sea-orm-rocket = "0.5.0"
+chrono = "0.4.35"
+sea-orm = { version = "0.12", features = ["sqlx-mysql", "runtime-tokio-native-tls", "macros"] }
+serde = { version = "1.0.196", features = ["derive"] }
+rocket_cors = "0.6.0"
+bcrypt = "0.15.1"
+jsonwebtoken = "9.3.0"
+dotenv = "0.15.0"
+tokio = "1.35.1"
+rand = "0.8.5"
+validator = { version = "0.18.1", features = ["derive"] }
+log="0.4.14"
+async-trait = "0.1.81"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 rust-bbs-api = { path = "api" }
 entity = { path = "entity" }
 common = { path = "common" }
-ferris-says = "0.3.1"
-rocket = { version = "0.5.0", features = ["json", "secrets"] }
-chrono = "0.4.35"
-dotenv = "0.15.0"
-sea-orm = { version = "0.12.15", features = ["sqlx-mysql", "runtime-tokio-native-tls", "macros"] }
-tokio = "1.35.1"
-async-trait = "0.1.77"
-serde = { version = "1.0.196", features = ["derive"] }
-rocket_cors = "0.6.0"
-bcrypt = "0.15.1"
-jsonwebtoken = "9.3.0"
+
+
