@@ -10,9 +10,9 @@ mod comment_api;
 
 use rocket::http::Method;
 use common::setup::set_up_db;
+use rocket_cors::{AllowedHeaders, AllowedOrigins};
 use crate::ums_user::{login, read, signup};
 use crate::post_api::{add_post, get_post_detail, post_list};
-use rocket_cors::{AllowedHeaders, AllowedOrigins};
 use crate::comment_api::{add_comment, delete_comment, get_list_with_page};
 use crate::favorite_api::{favorite, un_favorite};
 use crate::like_api::{get_list_in_page, like, unlike};
@@ -26,7 +26,7 @@ async fn start() -> Result<(), rocket::Error> {
     // You can also deserialize this
     let cors = rocket_cors::CorsOptions {
         allowed_origins,
-        allowed_methods: vec![Method::Get, Method::Post].into_iter().map(From::from).collect(),
+        allowed_methods: vec![Method::Get, Method::Post, Method::Options].into_iter().map(From::from).collect(),
         allowed_headers,
         allow_credentials: true,
         ..Default::default()
@@ -55,7 +55,7 @@ async fn start() -> Result<(), rocket::Error> {
         .mount("/user", routes![read, signup, login])
         .mount("/like", routes![like, unlike, get_list_in_page])
         .mount("/favorite", routes![favorite, un_favorite])
-        .mount("/follow", routes![follow_api::follow, follow_api::un_follow])
+        .mount("/follow", routes![follow_api::follow, follow_api::un_follow, follow_api::check_follow])
         .mount("/comment", routes![get_list_with_page, add_comment, delete_comment])
         .attach(cors)
         .launch()

@@ -15,3 +15,8 @@ pub async fn follow(db: &State<DatabaseConnection>, data: Json<AddFollowReq>) ->
 pub async fn un_follow(db: &State<DatabaseConnection>, data: Json<AddFollowReq>) -> Result<Json<Response<Value>>, ErrorResponder> {
     FollowService::un_follow_handle(db, data.following_id, data.follower_id).await
 }
+
+#[post("/check", format = "json", data = "<data>")]
+pub async fn check_follow(db: &State<DatabaseConnection>, data: Json<AddFollowReq>) -> Result<Json<Response<Value>>, ErrorResponder> {
+    FollowService::check_follow(db, data.following_id, data.follower_id).await
+}

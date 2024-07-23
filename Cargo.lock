@@ -2119,6 +2119,7 @@ dependencies = [
  "bcrypt",
  "common",
  "entity",
+ "jsonwebtoken",
  "rocket",
  "rocket_cors",
  "sea-orm",
@@ -2131,8 +2132,6 @@ dependencies = [
 name = "rust-bbs-server"
 version = "0.1.0"
 dependencies = [
- "common",
- "entity",
  "rust-bbs-api",
 ]
 

@@ -15,3 +15,4 @@ sea-orm = { workspace = true }
 serde = { workspace = true }
 rocket_cors = { workspace = true }
 bcrypt = { workspace = true }
+jsonwebtoken = { workspace = true }

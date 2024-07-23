@@ -10,6 +10,14 @@ use entity::vo::common::PageRes;
 pub struct CommentService;
 
 impl CommentService {
+
+    pub  async fn get_count(db: &DbConn, post_id: i32) -> u64 {
+        comment::Entity::find()
+            .filter(comment::Column::PostId.eq(post_id))
+            .count(db)
+            .await
+            .unwrap()
+    }
     pub async fn add_comment(db: &DbConn, data: Json<AddCommentReq>) -> Result<Json<Response<Value>>, ErrorResponder> {
         let res = comment::Entity::insert(comment::ActiveModel {
             user_id: sea_orm::Set(data.user_id),

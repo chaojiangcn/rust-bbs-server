@@ -27,7 +27,7 @@ async-trait = "0.1.81"
 
 [dependencies]
 rust-bbs-api = { path = "api" }
-entity = { path = "entity" }
-common = { path = "common" }
+#entity = { path = "entity" }
+#common = { path = "common" }
 
 

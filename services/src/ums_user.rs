@@ -69,7 +69,7 @@ pub async fn login(db: &DbConn, login_req: LoginReq) -> Result<Json<Response<Val
 
     // 验证通过生成 Jwt
     let claims = Claims {
-        sub: login_req.email.clone(),
+        sub: user[0].id.to_string(),
         exp: now + 3600,
     };
 

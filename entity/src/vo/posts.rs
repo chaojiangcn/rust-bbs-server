@@ -19,6 +19,7 @@ pub struct PostItemRes {
     pub like_count: i64,
     pub comment_count: i64,
     pub favorite_count: i64,
+    pub is_follow:bool
 }
 
 #[derive(Validate, Deserialize, Serialize)]
