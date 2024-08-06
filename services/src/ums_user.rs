@@ -69,8 +69,8 @@ pub async fn login(db: &DbConn, login_req: LoginReq) -> Result<Json<Response<Val
 
     // 验证通过生成 Jwt
     let claims = Claims {
-        sub: user[0].id.to_string(),
-        exp: now + 3600,
+        sub: user[0].id,
+        exp: now + 3600*60,
     };
 
     let token = encode(&Header::default(), &claims, &EncodingKey::from_secret("rust_bbs".as_ref()))?;

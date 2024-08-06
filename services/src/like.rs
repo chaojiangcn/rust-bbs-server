@@ -84,4 +84,20 @@ impl LikeService {
         }
         Ok(Json(success(json!({}), "success")))
     }
+
+    pub async fn check_like(
+        db: &DbConn,
+        post_id: i32,
+        user_id: i32,
+    ) -> Result<bool, ErrorResponder> {
+        let count = like::Entity::find()
+            .filter(like::Column::PostId.eq(post_id))
+            .filter(like::Column::UserId.eq(user_id))
+            .count(db)
+            .await;
+        if count.is_err() {
+            return Ok(false);
+        }
+        return Ok(count.unwrap() > 0);
+    }
 }

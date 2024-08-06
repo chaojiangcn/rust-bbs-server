@@ -10,10 +10,10 @@ use entity::vo::common::PageRes;
 use entity::vo::posts::{AddPostReq, AuthorInfo, PostItemRes};
 use log::trace;
 use sea_orm::{DbConn, EntityTrait, NotSet, PaginatorTrait, QueryOrder, Set};
-use sea_orm_rocket::rocket;
 use sea_orm_rocket::rocket::serde::json::serde_json::json;
 use sea_orm_rocket::rocket::serde::json::{Json, Value};
 use validator::Validate;
+use common::auth::Token;
 use crate::comment::CommentService;
 use crate::follow::FollowService;
 
@@ -48,10 +48,11 @@ impl PostService {
 
     /// 获取帖子详情
     pub async fn get_post_detail(
+        toke: Token,
         db: &DbConn,
-        uid: Option<i32>,
         id: i32,
     ) -> Result<Json<Response<Value>>, ErrorResponder> {
+        let uid = toke.claims.sub;
         let post = post::Entity::find_by_id(id).one(db).await?;
         if post.is_none() {
             return Ok(Json(error(json!(""), "post not found")));
@@ -61,11 +62,25 @@ impl PostService {
         let like_count = LikeService::get_count(db, id).await;
         let favorite_count = FavoriteService::get_count(db, id).await;
         let comment_count = CommentService::get_count(db, id).await;
-        let is_follow = if uid.is_none() {
+        let is_follow = if uid == 0 {
             false
         } else {
-            let is_follow = FollowService::check_follow_service(db, uid.unwrap(), post.author_id).await;
-            is_follow.unwrap_or_else(|err| false)
+            let is_follow = FollowService::check_follow_service(db, uid, post.author_id).await;
+            is_follow.unwrap_or_else(|_| false)
+        };
+
+        let is_like = if uid == 0 {
+            false
+        } else {
+            let is_like = LikeService::check_like(db, id, uid).await;
+            is_like.unwrap_or_else(|_| false)
+        };
+
+        let is_favorite = if uid == 0 {
+            false
+        } else {
+            let is_favorite = FavoriteService::check_favorite(db, id, uid).await;
+            is_favorite.unwrap_or_else(|_| false)
         };
 
 
@@ -76,6 +91,8 @@ impl PostService {
             favorite_count as i64,
             comment_count as i64,
             is_follow,
+            Option::from(is_favorite),
+            Option::from(is_like),
         );
         Ok(Json(success(json!(info), "success")))
     }
@@ -103,7 +120,7 @@ impl PostService {
                 let user = ums_user::Entity::find_by_id(post.author_id).one(db).await?;
                 let like_count = LikeService::get_count(db, post.id).await;
 
-                let info = build_post_info(post.clone(), user, like_count as i64, 0, 0, false);
+                let info = build_post_info(post.clone(), user, like_count as i64, 0, 0, false, None, None);
                 resp.list.push(info);
             }
             resp.total = num_pages;
@@ -121,6 +138,8 @@ fn build_post_info(
     favorite_count: i64,
     comment_count: i64,
     is_follow: bool,
+    is_favorite: Option<bool>,
+    is_like: Option<bool>,
 ) -> PostItemRes {
     let user_info = match user {
         None => AuthorInfo {
@@ -150,6 +169,8 @@ fn build_post_info(
         favorite_count,
         comment_count,
         is_follow,
+        is_favorite,
+        is_like,
     };
 
     info

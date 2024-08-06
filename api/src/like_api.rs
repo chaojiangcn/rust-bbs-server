@@ -23,7 +23,7 @@ pub async fn like(db: &State<DatabaseConnection>, data: Json<AddLikeReq>) -> Res
     LikeService::like(db, data).await
 }
 
-#[delete("/unlike", data = "<data>")]
+#[post("/unlike", data = "<data>")]
 pub async fn unlike(db: &State<DatabaseConnection>, data: Json<AddUnLikeReq>) -> Result<Json<Response<Value>>, ErrorResponder> {
     LikeService::unlike(db, data).await
 }

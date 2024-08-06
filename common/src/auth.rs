@@ -5,9 +5,9 @@ use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize,Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Claims {
-    pub sub: String,
+    pub sub: i32,
     pub exp: usize,
 }
 
@@ -21,9 +21,28 @@ impl<'r> FromRequest<'r> for Token {
 
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        let white_list = vec!["/user/login", "/user/signup", "/post/detail/"];
+
+        let is_white_list = white_list.iter().any(|x| {
+            return if request.uri().path().as_str().starts_with(x) {
+                true
+            } else {
+                false
+            }
+        });
+
         let keys: Vec<_> = request.headers().get("Authorization").collect();
-        if keys.len() != 1 {
-            return Outcome::Error((Status::Unauthorized, ()));
+        if keys.is_empty() {
+            return if is_white_list {
+                Outcome::Success(Token {
+                    claims: Claims {
+                        sub: 0,
+                        exp: 0,
+                    },
+                })
+            } else {
+                Outcome::Error((Status::Unauthorized, ()))
+            }
         }
 
         let token = keys[0].replace("Bearer ", "");
@@ -34,13 +53,12 @@ impl<'r> FromRequest<'r> for Token {
                 Outcome::Success(Token {
                     claims: token_data.claims,
                 })
-            },
+            }
             Err(err) => {
                 println!("decode token error: {:?}", err);
                 Outcome::Error((Status::Unauthorized, ()))
-            },
+            }
         }
-
     }
 }
 

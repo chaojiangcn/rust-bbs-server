@@ -50,4 +50,17 @@ impl FavoriteService {
         }
         Ok(Json(success(json!({}), "success")))
     }
+
+    pub async fn check_favorite(db: &DbConn, post_id: i32, user_id: i32) -> Result<bool, ErrorResponder> {
+        let count = favorite::Entity::find()
+            .filter(favorite::Column::PostId.eq(post_id))
+            .filter(favorite::Column::UserId.eq(user_id))
+            .count(db)
+            .await;
+        if count.is_err() {
+            return Ok(false);
+        }
+
+        return Ok(count.unwrap() > 0);
+    }
 }

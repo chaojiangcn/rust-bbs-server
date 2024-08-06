@@ -8,7 +8,6 @@ use common::response::{Response, success};
 pub struct FollowService;
 
 impl FollowService {
-
     pub async fn get_count(db: &DbConn, user_id: i32) -> u64 {
         follow::Entity::find()
             .filter(follow::Column::FollowerId.eq(user_id))

@@ -8,6 +8,7 @@ pub struct AuthorInfo {
     pub avatar: String,
     pub user_id: i32,
 }
+
 #[derive(Deserialize, Serialize)]
 pub struct PostItemRes {
     pub id: String,
@@ -19,7 +20,9 @@ pub struct PostItemRes {
     pub like_count: i64,
     pub comment_count: i64,
     pub favorite_count: i64,
-    pub is_follow:bool
+    pub is_follow: bool,
+    pub is_like: Option<bool>,
+    pub is_favorite: Option<bool>,
 }
 
 #[derive(Validate, Deserialize, Serialize)]
