@@ -28,7 +28,7 @@ impl<'r> FromRequest<'r> for Token {
                 true
             } else {
                 false
-            }
+            };
         });
 
         let keys: Vec<_> = request.headers().get("Authorization").collect();
@@ -42,7 +42,7 @@ impl<'r> FromRequest<'r> for Token {
                 })
             } else {
                 Outcome::Error((Status::Unauthorized, ()))
-            }
+            };
         }
 
         let token = keys[0].replace("Bearer ", "");
@@ -56,7 +56,16 @@ impl<'r> FromRequest<'r> for Token {
             }
             Err(err) => {
                 println!("decode token error: {:?}", err);
-                Outcome::Error((Status::Unauthorized, ()))
+                return if is_white_list {
+                    Outcome::Success(Token {
+                        claims: Claims {
+                            sub: 0,
+                            exp: 0,
+                        },
+                    })
+                } else {
+                    Outcome::Error((Status::Unauthorized, ()))
+                };
             }
         }
     }
