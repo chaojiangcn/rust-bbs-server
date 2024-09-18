@@ -1,5 +1,5 @@
 [default]
-port = 8000
+port = 8080
 secret_key = "xjyaCrYj8KyMoiETCswKrJ1ZKFsEYCpXmQJmrj5bPa8="
 
 [default.databases.sea_orm]
