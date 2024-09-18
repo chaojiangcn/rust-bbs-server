@@ -51,13 +51,13 @@ async fn start() -> Result<(), rocket::Error> {
 
     rocket::build()
         .manage(db)
+        .attach(cors)
         .mount("/post", routes![post_list, post_list_with_uid, get_post_detail, add_post])
         .mount("/user", routes![read, signup, login])
         .mount("/like", routes![like, unlike, get_list_in_page])
         .mount("/favorite", routes![favorite, un_favorite])
         .mount("/follow", routes![follow_api::follow, follow_api::un_follow, follow_api::check_follow])
         .mount("/comment", routes![get_list_with_page, add_comment, delete_comment])
-        .attach(cors)
         .launch()
         .await
         .map(|_| ())
