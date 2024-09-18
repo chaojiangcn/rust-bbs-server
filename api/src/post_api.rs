@@ -1,11 +1,10 @@
 use rocket::serde::json::{Json, Value};
-use rocket::serde::json::serde_json::json;
 use rocket::State;
 use sea_orm::DatabaseConnection;
 use common::auth::Token;
 use common::custom_responder::ErrorResponder;
 use common::request::PageParams;
-use common::response::{error, Response};
+use common::response::{Response};
 use entity::vo::posts::AddPostReq;
 
 use service::post::PostService;
@@ -17,6 +16,16 @@ pub async fn post_list(
     size: u64,
 ) -> Result<Json<Response<Value>>, ErrorResponder> {
     PostService::get_list_in_page(db, PageParams { page, size, keyword: None }).await
+}
+
+#[get("/list_this_uid?<uid>&<page>&<size>")]
+pub async fn post_list_with_uid(
+    db: &State<DatabaseConnection>,
+    uid: i32,
+    page: u64,
+    size: u64,
+) -> Result<Json<Response<Value>>, ErrorResponder> {
+    PostService::get_list_with_uid(db, uid,  PageParams { page, size, keyword: None }).await
 }
 
 

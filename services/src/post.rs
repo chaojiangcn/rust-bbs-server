@@ -9,11 +9,12 @@ use entity::post;
 use entity::vo::common::PageRes;
 use entity::vo::posts::{AddPostReq, AuthorInfo, PostItemRes};
 use log::trace;
-use sea_orm::{DbConn, EntityTrait, NotSet, PaginatorTrait, QueryOrder, Set};
+use sea_orm::{ColumnTrait, DbConn, EntityTrait, NotSet, PaginatorTrait, QueryFilter, QueryOrder, Set};
 use sea_orm_rocket::rocket::serde::json::serde_json::json;
 use sea_orm_rocket::rocket::serde::json::{Json, Value};
 use validator::Validate;
 use common::auth::Token;
+use common::pool::Db;
 use crate::comment::CommentService;
 use crate::follow::FollowService;
 
@@ -107,7 +108,44 @@ impl PostService {
             return Ok(Json(error(json!(""), &err_str)));
         }
         let paginator = post::Entity::find()
-            .order_by_asc(post::Column::Id)
+            .order_by_desc(post::Column::CreateTime)
+            .paginate(db, req.size);
+        let num_pages = paginator.num_pages().await?;
+        let res = paginator.fetch_page(req.page - 1).await;
+        let mut resp = PageRes {
+            list: vec![],
+            total: 0,
+        };
+        if let Ok(posts) = res {
+            for post in posts.iter() {
+                let user = ums_user::Entity::find_by_id(post.author_id).one(db).await?;
+                let like_count = LikeService::get_count(db, post.id).await;
+
+                let info = build_post_info(post.clone(), user, like_count as i64, 0, 0, false, None, None);
+                resp.list.push(info);
+            }
+            resp.total = num_pages;
+            return Ok(Json(success(json!(resp), "success")));
+        }
+
+        Ok(Json(success(json!(resp), "success")))
+    }
+
+
+    pub async fn get_list_with_uid(
+        db: &DbConn,
+        uid: i32,
+        req: PageParams,
+    ) -> Result<Json<Response<Value>>, ErrorResponder> {
+
+        if let Err(e) = req.validate() {
+            let err_str = e.to_string();
+            return Ok(Json(error(json!(""), &err_str)));
+        }
+
+        let paginator = post::Entity::find()
+            .order_by_desc(post::Column::CreateTime)
+            .filter(post::Column::AuthorId.eq(uid))
             .paginate(db, req.size);
         let num_pages = paginator.num_pages().await?;
         let res = paginator.fetch_page(req.page - 1).await;

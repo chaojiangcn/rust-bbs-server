@@ -6,9 +6,9 @@ use common::response::Response;
 use entity::vo::comment::AddCommentReq;
 use service::comment::CommentService;
 
-#[get("/list/<post_id>/<page>/<size>")]
-pub async fn get_list_with_page(db: &State<DatabaseConnection>, post_id: i32, page: u64, size: u64) -> Result<Json<Response<Value>>, ErrorResponder> {
-    CommentService::get_comment_list_with_page(db, post_id, page, size).await
+#[get("/list?<post_id>&<page>&<size>&<parent_comment_id>")]
+pub async fn get_list_with_page(db: &State<DatabaseConnection>, post_id: i32, page: u64, size: u64, parent_comment_id: Option<i32>) -> Result<Json<Response<Value>>, ErrorResponder> {
+    CommentService::get_comment_list_with_page(db, post_id, page, size, parent_comment_id).await
 }
 
 #[post("/add", data = "<data>")]
