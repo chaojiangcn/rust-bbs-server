@@ -1,5 +1,4 @@
 use sea_orm::{ColumnTrait, DbConn, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder};
-use sea_orm::JsonValue::Null;
 use sea_orm::prelude::DateTimeUtc;
 use sea_orm_rocket::rocket::serde::{Deserialize, Serialize};
 use sea_orm_rocket::rocket::serde::json::{Json, Value};

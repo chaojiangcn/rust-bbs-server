@@ -14,7 +14,6 @@ use sea_orm_rocket::rocket::serde::json::serde_json::json;
 use sea_orm_rocket::rocket::serde::json::{Json, Value};
 use validator::Validate;
 use common::auth::Token;
-use common::pool::Db;
 use crate::comment::CommentService;
 use crate::follow::FollowService;
 
