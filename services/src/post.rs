@@ -101,6 +101,7 @@ impl PostService {
         db: &DbConn,
         req: PageParams,
     ) -> Result<Json<Response<Value>>, ErrorResponder> {
+        println!("{:?}", req);
         // 参数验证
         if let Err(e) = req.validate() {
             let err_str = e.to_string();
@@ -126,7 +127,7 @@ impl PostService {
             resp.total = num_pages;
             return Ok(Json(success(json!(resp), "success")));
         }
-
+        println!("{:?}", resp);
         Ok(Json(success(json!(resp), "success")))
     }
 

@@ -2,14 +2,14 @@ use rocket::serde::{Deserialize, Serialize};
 use sea_orm::prelude::DateTime;
 use validator::Validate;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct AuthorInfo {
     pub nickname: String,
     pub avatar: String,
     pub user_id: i32,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct PostItemRes {
     pub id: String,
     pub title: String,
